@@ -17,10 +17,22 @@ public class AccountRepositoryTests {
 	@Test
 	public void testCreateAccount() {
 		Account account = new Account("14616432643214564312", 5000);
-		
 		Account savedAccount = repo.save(account);
 		
 		assertThat(savedAccount).isNotNull();
 		assertThat(savedAccount.getId()).isGreaterThan(0);
+	}
+	
+	@Test
+	public void testDepositAmount() {
+		Account account = new Account("14616432643214564312", 5000);
+		Account savedAccount = repo.save(account);
+		
+		repo.updateBalance(100, savedAccount.getId());
+		
+		Account updatedAccount = repo.findById(savedAccount.getId()).get();
+		
+		
+		assertThat(updatedAccount.getBalance()).isEqualTo(5100);
 	}
 }
