@@ -1,11 +1,17 @@
 package com.aa.account;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.aa.account.exception.NotFoundException;
+
 @Service
+@Transactional
 public class AccountService {
 
 	@Autowired
@@ -15,8 +21,12 @@ public class AccountService {
 		return repo.findAll();
 	}
 	
-	public Account get(Integer id) {
-		return repo.findById(id).get();
+	public Account get(Integer id) throws NotFoundException {
+		try {
+			return repo.findById(id).get();
+		} catch (NoSuchElementException e) {
+			throw new NotFoundException("Could not find any Account with ID: " + id);
+		}
 	}
 	
 	public Account save(Account account) {
@@ -35,7 +45,11 @@ public class AccountService {
 		return repo.findById(id).get();
 	}
 	
-	public void delete(Integer id) {
+	public void delete(Integer id) throws NotFoundException {
+		if (!repo.existsById(id)) {
+			throw new NotFoundException("Could not find any Account with ID: " + id);
+		}
+		
 		repo.deleteById(id);
 	}
 }
