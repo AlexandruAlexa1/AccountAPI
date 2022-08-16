@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,5 +66,15 @@ public class AccountRestController {
 		
 		return ResponseEntity.created(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).toUri())
 				.body(savedAccount);
+	}
+	
+	@PutMapping
+	public ResponseEntity<Account> update(@RequestBody Account account) throws NotFoundException {
+		Account updatedAccount = service.save(account);
+		
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
+		
+		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
 	}
 }
