@@ -3,6 +3,8 @@ package com.aa.account;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,14 +27,22 @@ public class AccountRestController {
 	private AccountService service;
 	
 	@GetMapping
-	public ResponseEntity<List<Account>> listAll() {
+	public ResponseEntity<CollectionModel<Account>> listAll() throws NotFoundException {
 		List<Account> listAccounts = service.listAll();
+		
+		for (Account account : listAccounts) {
+			account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
+			account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
+		}
 		
 		if (listAccounts.isEmpty()) {
 			return ResponseEntity.noContent().build();
 		}
+
+		CollectionModel<Account> model = CollectionModel.of(listAccounts);
+		model.add(linkTo(methodOn(AccountRestController.class).listAll()).withSelfRel());
 		
-		return new ResponseEntity<>(listAccounts, HttpStatus.OK);
+		return new ResponseEntity<>(model, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
@@ -40,7 +50,7 @@ public class AccountRestController {
 		Account account = service.get(id);
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
-		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel("collection"));
+		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(account, HttpStatus.OK);
 	}
