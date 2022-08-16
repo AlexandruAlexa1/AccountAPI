@@ -35,6 +35,7 @@ public class AccountRestController {
 		for (Account account : listAccounts) {
 			account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
 			account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
+			account.add(linkTo(methodOn(AccountRestController.class).withdraw(account.getId(), null)).withRel("withdrawals"));
 			account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		}
 		
@@ -54,6 +55,7 @@ public class AccountRestController {
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
 		account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
+		account.add(linkTo(methodOn(AccountRestController.class).withdraw(account.getId(), null)).withRel("withdrawals"));
 		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(account, HttpStatus.OK);
@@ -66,6 +68,7 @@ public class AccountRestController {
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).withSelfRel());
 		account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
+		account.add(linkTo(methodOn(AccountRestController.class).withdraw(account.getId(), null)).withRel("withdrawals"));
 		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return ResponseEntity.created(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).toUri())
@@ -78,6 +81,7 @@ public class AccountRestController {
 		
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).deposit(updatedAccount.getId(), null)).withRel("deposits"));
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).withdraw(updatedAccount.getId(), null)).withRel("withdrawals"));
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
@@ -89,12 +93,23 @@ public class AccountRestController {
 		
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).deposit(updatedAccount.getId(), null)).withRel("deposits"));
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).withdraw(updatedAccount.getId(), null)).withRel("withdrawals"));
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
 	}
 	
-	
+	@PatchMapping("/{id}/withdraw")
+	public ResponseEntity<Account> withdraw(@PathVariable("id") Integer id, @RequestBody Amount amount) throws NotFoundException {
+		Account updatedAccount = service.withdraw(amount.getAmount(), id);
+		
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).deposit(updatedAccount.getId(), null)).withRel("deposits"));
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).withdraw(updatedAccount.getId(), null)).withRel("withdrawals"));
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
+		
+		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+	}
 }
 
 
