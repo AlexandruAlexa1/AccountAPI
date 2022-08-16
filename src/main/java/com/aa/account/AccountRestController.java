@@ -57,9 +57,13 @@ public class AccountRestController {
 	
 	
 	@PostMapping
-	public ResponseEntity<Account> add(@RequestBody Account account) {
+	public ResponseEntity<Account> add(@RequestBody Account account) throws NotFoundException {
 		Account savedAccount = service.save(account);
 		
-		return new ResponseEntity<>(savedAccount, HttpStatus.CREATED);
+		account.add(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).withSelfRel());
+		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
+		
+		return ResponseEntity.created(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).toUri())
+				.body(savedAccount);
 	}
 }
