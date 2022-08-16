@@ -40,6 +40,7 @@ public class AccountRestController {
 		Account account = service.get(id);
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
+		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel("collection"));
 		
 		return new ResponseEntity<>(account, HttpStatus.OK);
 	}
