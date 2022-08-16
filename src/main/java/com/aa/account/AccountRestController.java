@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aa.account.exception.NotFoundException;
+
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountRestController {
@@ -29,8 +31,10 @@ public class AccountRestController {
 	}
 	
 	@GetMapping("/{id}")
-	public Account getOne(@PathVariable("id") Integer id) {
-		return service.get(id);
+	public ResponseEntity<Account> getOne(@PathVariable("id") Integer id) throws NotFoundException {
+		Account account = service.get(id);
+		
+		return new ResponseEntity<>(account, HttpStatus.OK);
 	}
 	
 }

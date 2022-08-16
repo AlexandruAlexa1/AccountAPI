@@ -1,9 +1,12 @@
 package com.aa.account;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.aa.account.exception.NotFoundException;
 
 @Service
 public class AccountService {
@@ -15,8 +18,12 @@ public class AccountService {
 		return repo.findAll();
 	}
 	
-	public Account get(Integer id) {
-		return repo.findById(id).get();
+	public Account get(Integer id) throws NotFoundException {
+		try {
+			return repo.findById(id).get();
+		} catch (NoSuchElementException e) {
+			throw new NotFoundException("Could not find any Account with ID: " + id);
+		}
 	}
 	
 	public Account save(Account account) {
