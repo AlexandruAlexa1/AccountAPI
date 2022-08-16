@@ -45,7 +45,11 @@ public class AccountService {
 		return repo.findById(id).get();
 	}
 	
-	public void delete(Integer id) {
+	public void delete(Integer id) throws NotFoundException {
+		if (!repo.existsById(id)) {
+			throw new NotFoundException("Could not find any Account with ID: " + id);
+		}
+		
 		repo.deleteById(id);
 	}
 }
