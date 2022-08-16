@@ -8,6 +8,7 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,6 +34,7 @@ public class AccountRestController {
 		
 		for (Account account : listAccounts) {
 			account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
+			account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
 			account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		}
 		
@@ -51,6 +53,7 @@ public class AccountRestController {
 		Account account = service.get(id);
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
+		account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
 		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(account, HttpStatus.OK);
@@ -62,6 +65,7 @@ public class AccountRestController {
 		Account savedAccount = service.save(account);
 		
 		account.add(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).withSelfRel());
+		account.add(linkTo(methodOn(AccountRestController.class).deposit(account.getId(), null)).withRel("deposits"));
 		account.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return ResponseEntity.created(linkTo(methodOn(AccountRestController.class).getOne(savedAccount.getId())).toUri())
@@ -73,8 +77,29 @@ public class AccountRestController {
 		Account updatedAccount = service.save(account);
 		
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).deposit(updatedAccount.getId(), null)).withRel("deposits"));
 		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
 		
 		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
 	}
+	
+	@PatchMapping("/{id}/deposit")
+	public ResponseEntity<Account> deposit(@PathVariable("id") Integer id, @RequestBody Amount amount) throws NotFoundException {
+		Account updatedAccount = service.deposit(amount.getAmount(), id);
+		
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).getOne(updatedAccount.getId())).withSelfRel());
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).deposit(updatedAccount.getId(), null)).withRel("deposits"));
+		updatedAccount.add(linkTo(methodOn(AccountRestController.class).listAll()).withRel(IanaLinkRelations.COLLECTION));
+		
+		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+	}
+	
+	
 }
+
+
+
+
+
+
+

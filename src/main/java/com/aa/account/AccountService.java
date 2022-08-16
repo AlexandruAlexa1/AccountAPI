@@ -3,12 +3,15 @@ package com.aa.account;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aa.account.exception.NotFoundException;
 
 @Service
+@Transactional
 public class AccountService {
 
 	@Autowired
