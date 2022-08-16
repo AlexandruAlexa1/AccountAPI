@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aa.account.exception.NotFoundException;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountRestController {
@@ -35,6 +38,8 @@ public class AccountRestController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Account> getOne(@PathVariable("id") Integer id) throws NotFoundException {
 		Account account = service.get(id);
+		
+		account.add(linkTo(methodOn(AccountRestController.class).getOne(account.getId())).withSelfRel());
 		
 		return new ResponseEntity<>(account, HttpStatus.OK);
 	}
